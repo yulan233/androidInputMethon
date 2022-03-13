@@ -1,0 +1,35 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="信息">
+
+        <EditTextPreference
+            app:key="signature"
+            app:title="你的名字"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="默认回复行为"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="同步">
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="定期同步电子邮件" />
+
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="attachment"
+            app:summaryOff="只有在有人要求时才会下载附件。"
+            app:summaryOn="自动下载收到的电子邮件的附件"
+            app:title="下载收到的附件" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
