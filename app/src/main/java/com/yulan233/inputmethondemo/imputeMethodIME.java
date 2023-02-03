@@ -3,9 +3,7 @@ package com.yulan233.inputmethondemo;
 import android.inputmethodservice.InputMethodService;
 //import android.inputmethodservice.Keyboard;
 //import android.inputmethodservice.KeyboardView;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
@@ -22,12 +20,11 @@ import com.yulan233.inputmethondemo.databinding.LayoutTextviewBinding;
 import com.yulan233.inputmethondemo.keyboard.CandidatedHanZi;
 import com.yulan233.inputmethondemo.keyboard.KeyboardView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class imputeMethodIME extends InputMethodService implements KeyboardView.OnKeyboardActionListener {
+    private static final String TAG = "sdf";
     private InputConnection ic;
     private KeyboardView keyboardView;
 
@@ -45,6 +42,8 @@ public class imputeMethodIME extends InputMethodService implements KeyboardView.
     private List<String> pinyinCandidates;
     @Override
     public void onCreate(){
+//        dateBase d=new dateBase(getApplicationContext(),"ff_db.db",null,2);
+//        SQLiteDatabase read=d.getReadableDatabase();
         super.onCreate();
     }
     @Override
@@ -82,23 +81,31 @@ public class imputeMethodIME extends InputMethodService implements KeyboardView.
         b=b+a;
         pinyin.setText((CharSequence) b);
     }
+    //设置候选项
     private void putCandidates(){
+        //获取到候选项的位子
         RecyclerView recyclerView= layoutKeyboardQwertyBinding.someText;
+        //获得排序后的汉字
         List<searchedHanZi> l1=pinyinEngine.getSortedHanZi();
         List<searchedHanZi> l2;
+        //只排前30个
         if (l1.size()>30) {
             l2 = l1.subList(l1.size() - 30, l1.size());
         }
         else{
             l2 = l1;
         }
+        Collections.reverse(l2);
+        //放入汉字到候选项
         CandidatedHanZi candidatedHanZi=new CandidatedHanZi(l2,this,keyboardView);
-
+        //设置啥啥啥忘了
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
+        //设置方向
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        //设置线性管理
         recyclerView.setLayoutManager(linearLayoutManager);
+        //设置Adapter
         recyclerView.setAdapter(candidatedHanZi);
-
     }
 
     @Override
@@ -126,9 +133,14 @@ public class imputeMethodIME extends InputMethodService implements KeyboardView.
             pinyinEngine.searchPinYin();
             pinyin.setText((CharSequence) pinyinEngine.getPinyin());
             putCandidates();
-
+        }else if (pinyinEngine!=null&& (pinyinEngine.getSortedHanZi()) !=null){//输入完一个子就清除一下
+            ic.commitText("" + primaryCode, 1);
+            pinyinEngine.setNullHanzi();
+            putCandidates();
+            pinyin.setText((CharSequence)"");
+        }else{//正常输入字母数字啥的
+            ic.commitText("" + primaryCode, 1);
         }
-        ic.commitText("" + primaryCode, 1);
 
     }
 
@@ -140,7 +152,10 @@ public class imputeMethodIME extends InputMethodService implements KeyboardView.
     @Override
     public void onKey(int primaryCode, int[] keyCodes) {
 //        判断是哪个按键
-//        -5是退格，-6切换数字键，-7返回键
+//        -5是退格，-6切换数字键，-7返回键 -4是关闭
+        if(primaryCode==-4){
+
+        }
         if (primaryCode==-5&&pinyinEngine==null){
 //            CharSequence selectText= ic.getSelectedText(0);
 //            判断是否有选择的内容
@@ -177,12 +192,27 @@ public class imputeMethodIME extends InputMethodService implements KeyboardView.
                         }
                     }
                 }
+                //此时没有了拼音所以设置拼音为空和把候选项清空
+                if (a==""){
+                    pinyinEngine.setNullHanzi();
+                }else{
+                    pinyinEngine.setPinyin(a);
+                    pinyinEngine.searchPinYin();
+                }
+                putCandidates();
                 pinyin.setText((CharSequence)a);
+
             }
         }
         if (primaryCode==-6){
             keyboardView.switchMainKeyboard("number");
+            if(pinyinEngine!=null){
+                pinyinEngine.setNullHanzi();
+                putCandidates();
+                pinyin.setText((CharSequence)"");
+            }
             setCandidatesViewShown(false);
+
         }
         if (primaryCode==-7){
             keyboardView.switchMainKeyboard("qwerty");
@@ -198,7 +228,9 @@ public class imputeMethodIME extends InputMethodService implements KeyboardView.
         if (primaryCode==-9&&pinyinEngine==null){
             pinyinEngine=new PinyinEngine();
             pinyinEngine.setContext(getApplicationContext());
+            pinyinEngine.imporDatabase();
             setCandidatesViewShown(true);
+            keyboardView.setUpperABC(false);
         }else if(primaryCode==-9){
             pinyinEngine=null;
             setCandidatesViewShown(false);

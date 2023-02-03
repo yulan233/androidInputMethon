@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
         <service
             android:name=".imputeMethodIME"
-            android:label="输入法Demo"
+            android:label="智能输入法"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
@@ -25,7 +25,7 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
-            android:label="输入法Demo" >
+            android:label="智能输入法" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

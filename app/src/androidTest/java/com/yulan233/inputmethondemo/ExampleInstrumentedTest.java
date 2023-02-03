@@ -23,5 +23,6 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         assertEquals("com.yulan233.inputmethondemo", appContext.getPackageName());
+        dateBase d=new dateBase(appContext,"fs.db",null,1);
     }
 }

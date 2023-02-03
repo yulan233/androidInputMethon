@@ -92,7 +92,12 @@ public class KeyboardView extends View implements View.OnClickListener,View.OnTo
 //    主键盘
     private ViewBinding mKeyboardBinding;
     private View mKeyboard;
+    private boolean upperABC=false;
 
+    //设置字母大小写
+    public void setUpperABC(boolean upperABC) {
+        this.upperABC = upperABC;
+    }
 
     public KeyboardView(Context context) {
         super(context);
@@ -178,7 +183,13 @@ public class KeyboardView extends View implements View.OnClickListener,View.OnTo
             mKeyboardActionListener.onPress(view.getText());
             return;
         }
+
         TextView view=mKeyboard.findViewById(v.getId());
+
+        if(view.getText().equals("关闭")){
+            mKeyboardActionListener.onKey(-4,null);
+            return;
+        }
         if(view.getText().equals("退格")){
             mKeyboardActionListener.onKey(-5,null);
             return;
@@ -193,6 +204,10 @@ public class KeyboardView extends View implements View.OnClickListener,View.OnTo
         }
         if(view.getText().equals("发送")){
             mKeyboardActionListener.onKey(-8,null);
+            return;
+        }
+        if(view.getText().equals("切换大小写")){
+            upperABC=!upperABC;
             return;
         }
         if (view.getText().equals("英to中")||view.getText().equals("中to英")){
@@ -210,6 +225,13 @@ public class KeyboardView extends View implements View.OnClickListener,View.OnTo
         if(view.getText().equals("空格")){
             mKeyboardActionListener.onPress(" ");
             return;
+        }
+        //大写输入
+        if (view.getText().toString().matches("[A-Za-z]")){
+            if (upperABC){
+                mKeyboardActionListener.onPress(view.getText().toString().toUpperCase());
+                return;
+            }
         }
         mKeyboardActionListener.onPress(view.getText());
     }
